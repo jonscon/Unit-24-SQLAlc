@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}User Information{% endblock %}
+{% block content %}
+<h1>{{ user.first_name }} {{ user.last_name }}</h1>
+<img src="{{user.image_url}}">
+<!-- <a class="btn btn-sm btn-primary" href="/users/{{ user.id }}/edit">Edit</a> -->
+<form>
+    <button class="btn btn-sm btn-primary"
+    formaction="/users/{{user.id}}/edit" 
+    formmethod="GET">Edit</button>
+    <button class="btn btn-sm btn-danger"
+    formaction="/users/{{user.id}}/delete" 
+    formmethod="POST">Delete</button>
+</form>
+
+<h2>Posts</h2>
+<ul>
+    {% for post in user.posts %}
+    <li>
+        <a href="/posts/{{post.id}}">{{post.title}}</a>
+        <small>{{post.created_at}}</small>
+    </li>
+    {% endfor %}
+</ul>
+
+<a class="btn btn-sm btn-primary" 
+href="/users/{{user.id}}/posts/new">Add Post</a>
+{% endblock %}
