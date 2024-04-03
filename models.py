@@ -28,6 +28,7 @@ class User(db.Model):
     last_name = db.Column(db.String(50), nullable=False)
     image_url = db.Column(db.String(200), nullable=True, default=DEFAULT_IMAGE_URL)
     
+    # delete-orphan deletes all posts that a user created if that user is deleted
     posts = db.relationship('Post', cascade='all, delete-orphan', 
                             backref="user")
 
@@ -50,8 +51,36 @@ class Post(db.Model):
                            default=datetime.datetime.now())
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'))
 
+    tags = db.relationship('Tag', secondary="posts_tags", backref="posts")
+
     @property
     def friendly_date(self):
         """Return nicely-formatted date."""
 
         return self.created_at.strftime("%a %b %-d  %Y, %-I:%M %p")
+
+class Tag(db.Model):
+    """Tag."""
+
+    __tablename__ = "tags"
+
+    def __repr__(self):
+        t = self
+        return f"<Tag id={t.id} name={t.name}>"
+    
+    id = db.Column(db.Integer,
+                   primary_key=True,
+                   autoincrement=True)
+    
+    name = db.Column(db.Text, nullable=False, unique=True)
+
+class PostTag(db.Model):
+    """Joins Post and Tag tables."""
+
+    __tablename__ = "posts_tags"
+
+    post_id = db.Column(db.Integer, db.ForeignKey(
+        'posts.id', ondelete='SET NULL'), nullable=True, primary_key=True)
+    
+    tag_id = db.Column(db.Integer, db.ForeignKey(
+        'tags.id', ondelete='SET NULL'), nullable=True, primary_key=True)
